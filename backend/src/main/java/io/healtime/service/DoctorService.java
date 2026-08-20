@@ -27,24 +27,26 @@ public class DoctorService {
     private final SpecializationRepository specs;
     private final SecurityUtils security;
 
+    @Transactional(readOnly = true)
     public Page<DoctorView> search(String specSlug, String q, int page, int size) {
         return doctors.search(specSlug, q, PageRequest.of(page, size)).map(this::toView);
     }
 
+    @Transactional(readOnly = true)
     public DoctorView get(UUID id) {
         return toView(doctors.findById(id).orElseThrow(() -> ApiException.notFound("Doctor")));
     }
 
     public List<SpecializationView> specializations() {
         return specs.findAll().stream()
-            .map(s -> new SpecializationView(s.getId(), s.getName(), s.getSlug(), s.getDescription(), s.getIcon()))
-            .toList();
+                .map(s -> new SpecializationView(s.getId(), s.getName(), s.getSlug(), s.getDescription(), s.getIcon()))
+                .toList();
     }
 
     @Transactional
     public DoctorView updateOwnProfile(DoctorUpdateRequest req) {
         Doctor d = doctors.findByUserId(security.currentUser().getId())
-            .orElseThrow(() -> ApiException.notFound("Doctor profile"));
+                .orElseThrow(() -> ApiException.notFound("Doctor profile"));
         if (req.specializationId() != null) {
             Specialization s = specs.findById(req.specializationId()).orElseThrow(() -> ApiException.notFound("Specialization"));
             d.setSpecialization(s);
@@ -60,27 +62,27 @@ public class DoctorService {
 
     public List<AvailabilitySlot> getAvailability(UUID doctorId) {
         return availability.findAllByDoctorId(doctorId).stream()
-            .map(a -> new AvailabilitySlot(a.getDayOfWeek(), a.getStartTime(), a.getEndTime(), a.getSlotDurationMin()))
-            .toList();
+                .map(a -> new AvailabilitySlot(a.getDayOfWeek(), a.getStartTime(), a.getEndTime(), a.getSlotDurationMin()))
+                .toList();
     }
 
     @Transactional
     public void setOwnAvailability(AvailabilityUpdateRequest req) {
         Doctor d = doctors.findByUserId(security.currentUser().getId())
-            .orElseThrow(() -> ApiException.notFound("Doctor profile"));
+                .orElseThrow(() -> ApiException.notFound("Doctor profile"));
         availability.deleteAllByDoctorId(d.getId());
         req.slots().forEach(s -> availability.save(DoctorAvailability.builder()
-            .doctor(d).dayOfWeek(s.dayOfWeek())
-            .startTime(s.startTime()).endTime(s.endTime())
-            .slotDurationMin(s.slotDurationMin()).build()));
+                .doctor(d).dayOfWeek(s.dayOfWeek())
+                .startTime(s.startTime()).endTime(s.endTime())
+                .slotDurationMin(s.slotDurationMin()).build()));
     }
 
     private DoctorView toView(Doctor d) {
         return new DoctorView(
-            d.getId(), d.getUser().getId(), d.getUser().getFullName(), d.getUser().getEmail(), d.getUser().getAvatarUrl(),
-            d.getSpecialization().getName(), d.getSpecialization().getSlug(),
-            d.getLicenseNumber(), d.getYearsExperience(), d.getBio(),
-            d.getConsultationFee(), d.getClinicName(), d.getLocation(),
-            d.getRating(), d.isVerified());
+                d.getId(), d.getUser().getId(), d.getUser().getFullName(), d.getUser().getEmail(), d.getUser().getAvatarUrl(),
+                d.getSpecialization().getName(), d.getSpecialization().getSlug(),
+                d.getLicenseNumber(), d.getYearsExperience(), d.getBio(),
+                d.getConsultationFee(), d.getClinicName(), d.getLocation(),
+                d.getRating(), d.isVerified());
     }
 }

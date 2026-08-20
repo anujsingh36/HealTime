@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { Auth as AuthApi } from '../api/endpoints';
+import { Auth as AuthApi, Specs } from '../api/endpoints';
 import { useAuth } from '../store/auth';
 import { Logo } from '../components/Logo';
 
@@ -13,10 +13,18 @@ export default function Auth() {
 
   const [form, setForm] = useState({
     email: '', password: '', fullName: '', phone: '',
-    role: params.get('role') || 'PATIENT'
+    role: params.get('role') || 'PATIENT',
+    specializationId: '', licenseNumber: ''
   });
+  const [specializations, setSpecializations] = useState([]);
   const [loading, setLoading] = useState(false);
   const set = (k) => (e) => setForm(f => ({ ...f, [k]: e.target.value }));
+
+  useEffect(() => {
+    if (mode === 'register' && form.role === 'DOCTOR' && specializations.length === 0) {
+      Specs.list().then(setSpecializations).catch(() => {});
+    }
+  }, [mode, form.role]);
 
   const submit = async (e) => {
     e.preventDefault();
@@ -64,6 +72,23 @@ export default function Auth() {
                   ))}
                 </div>
               </div>
+              {form.role === 'DOCTOR' && (
+                <>
+                  <div className="mt-3">
+                    <label className="label">Specialization</label>
+                    <select className="input" value={form.specializationId} onChange={set('specializationId')} required>
+                      <option value="">Select a specialization</option>
+                      {specializations.map(s => (
+                        <option key={s.id} value={s.id}>{s.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="mt-3">
+                    <label className="label">Medical license number</label>
+                    <input className="input" value={form.licenseNumber} onChange={set('licenseNumber')} required/>
+                  </div>
+                </>
+              )}
             </>
           )}
           <div className="mt-3"><label className="label">Email</label><input type="email" className="input" value={form.email} onChange={set('email')} required/></div>

@@ -9,11 +9,14 @@ import java.util.UUID;
 public class AuthDtos {
 
     public record RegisterRequest(
-        @Email @NotBlank String email,
-        @NotBlank @Size(min = 8, max = 72) String password,
-        @NotBlank String fullName,
-        String phone,
-        @NotNull Role role
+            @Email @NotBlank String email,
+            @NotBlank @Size(min = 8, max = 72) String password,
+            @NotBlank String fullName,
+            String phone,
+            @NotNull Role role,
+            // Required only when role == DOCTOR
+            UUID specializationId,
+            String licenseNumber
     ) {}
 
     public record LoginRequest(@Email @NotBlank String email, @NotBlank String password) {}

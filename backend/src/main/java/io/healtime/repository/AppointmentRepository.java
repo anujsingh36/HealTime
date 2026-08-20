@@ -29,4 +29,6 @@ public interface AppointmentRepository extends JpaRepository<Appointment, UUID> 
 
     long countByDoctorIdAndScheduledAtBetween(UUID doctorId, Instant from, Instant to);
     long countByStatus(AppointmentStatus status);
+
+    boolean existsByDoctorIdAndScheduledAtAndStatusNot(UUID doctorId, Instant scheduledAt, AppointmentStatus status);
 }
