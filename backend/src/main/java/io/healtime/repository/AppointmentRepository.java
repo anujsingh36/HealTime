@@ -31,4 +31,33 @@ public interface AppointmentRepository extends JpaRepository<Appointment, UUID> 
     long countByStatus(AppointmentStatus status);
 
     boolean existsByDoctorIdAndScheduledAtAndStatusNot(UUID doctorId, Instant scheduledAt, AppointmentStatus status);
+
+    @Query("""
+       select a from Appointment a
+       where a.doctor.id = :doctorId
+         and a.status in :statuses
+         and a.scheduledAt >= :from and a.scheduledAt < :to
+       order by a.scheduledAt asc
+    """)
+    List<Appointment> findActiveByDoctorAndDayOrderByScheduledAt(@Param("doctorId") UUID doctorId,
+                                                                 @Param("from") Instant from,
+                                                                 @Param("to") Instant to,
+                                                                 @Param("statuses") List<AppointmentStatus> statuses);
+
+    @Query("""
+       select a from Appointment a
+       where a.doctor.id = :doctorId
+         and a.status = io.healtime.entity.AppointmentStatus.COMPLETED
+         and a.startedAt is not null and a.completedAt is not null
+       order by a.completedAt desc
+    """)
+    List<Appointment> findRecentCompleted(@Param("doctorId") UUID doctorId);
+
+    @Query("""
+       select a from Appointment a
+       where a.status in :statuses
+         and a.patientLat is not null and a.patientLng is not null
+         and a.leaveNotified = false
+    """)
+    List<Appointment> findActiveWithLocationPendingLeaveNotice(@Param("statuses") List<AppointmentStatus> statuses);
 }

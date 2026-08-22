@@ -1,7 +1,9 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
+import { useEffect } from 'react';
 import PublicLayout from './layouts/PublicLayout';
 import AppLayout from './layouts/AppLayout';
 import { ProtectedRoute } from './components/ProtectedRoute';
+import { useAuth } from './store/auth';
 
 import Landing from './pages/Landing';
 import Auth from './pages/Auth';
@@ -27,6 +29,8 @@ import AdminPatients from './pages/admin/Patients';
 import AdminVerify from './pages/admin/Verify';
 
 export default function App() {
+  const checkExpiry = useAuth(s => s.checkExpiry);
+  useEffect(() => { checkExpiry(); }, [checkExpiry]);
   return (
     <Routes>
       <Route element={<PublicLayout />}>

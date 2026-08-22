@@ -32,6 +32,12 @@ public class AppointmentController {
     @GetMapping("/patient/appointments/{id}/queue")
     public QueueView queue(@PathVariable UUID id) { return service.myQueuePosition(id); }
 
+    @PreAuthorize("hasRole('PATIENT')")
+    @PatchMapping("/patient/appointments/{id}/location")
+    public void updateLocation(@PathVariable UUID id, @Valid @RequestBody LocationUpdate req) {
+        service.updateMyLocation(id, req.lat(), req.lng());
+    }
+
     @PreAuthorize("hasRole('DOCTOR')")
     @GetMapping("/doctor/appointments")
     public List<AppointmentView> doctorList() { return service.doctorAppointments(); }

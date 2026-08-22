@@ -7,7 +7,12 @@ import { CalendarDays, Search, FileText, Clock } from 'lucide-react';
 
 export default function PatientDashboard() {
   const [list, setList] = useState([]);
-  useEffect(() => { Appointments.mine().then(setList).catch(()=>{}); }, []);
+  useEffect(() => {
+    const load = () => Appointments.mine().then(setList).catch(()=>{});
+    load();
+    const t = setInterval(load, 15000);
+    return () => clearInterval(t);
+  }, []);
   const upcoming = list.filter(a => ['PENDING','CONFIRMED','IN_PROGRESS'].includes(a.status)).slice(0,3);
 
   return (

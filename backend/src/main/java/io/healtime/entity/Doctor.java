@@ -29,6 +29,14 @@ public class Doctor extends BaseEntity {
     private String clinicName;
     private String location;
 
+    /** Optional manual fallback (minutes) used when there isn't enough completed-appointment
+     *  history yet to compute a real average consultation duration. */
+    private Integer avgConsultationMin;
+
+    /** Clinic coordinates, used to estimate patient travel time for "time to leave" notifications. */
+    private Double clinicLat;
+    private Double clinicLng;
+
     @Builder.Default
     private BigDecimal rating = BigDecimal.ZERO;
 

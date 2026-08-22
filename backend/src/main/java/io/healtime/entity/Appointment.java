@@ -6,8 +6,8 @@ import lombok.*;
 import java.time.Instant;
 
 @Entity @Table(name = "appointments", indexes = {
-    @Index(name = "idx_appt_doctor_date", columnList = "doctor_id, scheduled_at"),
-    @Index(name = "idx_appt_patient", columnList = "patient_id")
+        @Index(name = "idx_appt_doctor_date", columnList = "doctor_id, scheduled_at"),
+        @Index(name = "idx_appt_patient", columnList = "patient_id")
 })
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class Appointment extends BaseEntity {
@@ -33,4 +33,14 @@ public class Appointment extends BaseEntity {
 
     private Integer queuePosition;
     private Integer estimatedWaitMin;
+
+    private Instant startedAt;
+    private Instant completedAt;
+
+    private Double patientLat;
+    private Double patientLng;
+    private Instant patientLocationUpdatedAt;
+
+    @Builder.Default
+    private boolean leaveNotified = false;
 }

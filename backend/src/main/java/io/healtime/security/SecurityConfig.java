@@ -25,6 +25,7 @@ public class SecurityConfig {
     private final CustomUserDetailsService userDetailsService;
     private final CorsFilter corsFilter;
     private final RestAuthEntryPoint authEntryPoint;
+    private final RestAccessDeniedHandler accessDeniedHandler;
 
     @Bean
     public PasswordEncoder passwordEncoder() { return new BCryptPasswordEncoder(); }
@@ -45,20 +46,22 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(csrf -> csrf.disable())
-            .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .exceptionHandling(e -> e.authenticationEntryPoint(authEntryPoint))
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**", "/api/public/**",
-                    "/v3/api-docs/**", "/swagger-ui/**", "/swagger", "/actuator/health").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/doctors/search", "/api/specializations").permitAll()
-                .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                .requestMatchers("/api/doctor/**").hasAnyRole("DOCTOR","ADMIN")
-                .requestMatchers("/api/patient/**").hasAnyRole("PATIENT","ADMIN")
-                .anyRequest().authenticated())
-            .authenticationProvider(authProvider())
-            .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
-            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                .csrf(csrf -> csrf.disable())
+                .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .exceptionHandling(e -> e
+                        .authenticationEntryPoint(authEntryPoint)
+                        .accessDeniedHandler(accessDeniedHandler))
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/auth/**", "/api/public/**",
+                                "/v3/api-docs/**", "/swagger-ui/**", "/swagger", "/actuator/health").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/doctors/search", "/api/specializations").permitAll()
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/doctor/**").hasAnyRole("DOCTOR","ADMIN")
+                        .requestMatchers("/api/patient/**").hasAnyRole("PATIENT","ADMIN")
+                        .anyRequest().authenticated())
+                .authenticationProvider(authProvider())
+                .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 }

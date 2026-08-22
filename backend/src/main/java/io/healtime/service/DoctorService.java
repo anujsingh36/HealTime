@@ -57,6 +57,9 @@ public class DoctorService {
         if (req.consultationFee() != null) d.setConsultationFee(req.consultationFee());
         if (req.clinicName() != null) d.setClinicName(req.clinicName());
         if (req.location() != null) d.setLocation(req.location());
+        if (req.avgConsultationMin() != null) d.setAvgConsultationMin(req.avgConsultationMin());
+        if (req.clinicLat() != null) d.setClinicLat(req.clinicLat());
+        if (req.clinicLng() != null) d.setClinicLng(req.clinicLng());
         return toView(doctors.save(d));
     }
 
@@ -83,6 +86,7 @@ public class DoctorService {
                 d.getSpecialization().getName(), d.getSpecialization().getSlug(),
                 d.getLicenseNumber(), d.getYearsExperience(), d.getBio(),
                 d.getConsultationFee(), d.getClinicName(), d.getLocation(),
-                d.getRating(), d.isVerified());
+                d.getRating(), d.isVerified(),
+                d.getAvgConsultationMin(), d.getClinicLat(), d.getClinicLng());
     }
 }

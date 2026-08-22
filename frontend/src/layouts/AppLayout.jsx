@@ -1,6 +1,7 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { Logo } from '../components/Logo';
 import { NotificationBell } from '../components/NotificationBell';
+import { TurnAlertWatcher } from '../components/TurnAlertWatcher';
 import { useAuth } from '../store/auth';
 import { initials } from '../lib/utils';
 import {
@@ -38,6 +39,7 @@ export default function AppLayout() {
 
   return (
     <div className="min-h-screen flex bg-ink-50">
+      {role() === 'PATIENT' && <TurnAlertWatcher />}
       <aside className="hidden md:flex flex-col w-64 bg-white border-r border-ink-100 px-4 py-5 sticky top-0 h-screen">
         <div className="px-2 mb-6"><Logo /></div>
         <nav className="flex-1 space-y-1">

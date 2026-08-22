@@ -9,7 +9,11 @@ import { Empty } from '../../components/Empty';
 export default function PatientAppointments() {
   const [list, setList] = useState([]);
   const load = () => Appointments.mine().then(setList).catch(()=>{});
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+    const t = setInterval(load, 15000);
+    return () => clearInterval(t);
+  }, []);
 
   const cancel = async (id) => {
     if (!confirm('Cancel this appointment?')) return;

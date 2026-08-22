@@ -49,7 +49,9 @@ export default function PatientRecords() {
                     <td className="p-4 font-semibold">{r.title}</td>
                     <td className="p-4 text-ink-900/70">{r.recordType || '—'}</td>
                     <td className="p-4 text-ink-900/70">{fmtDate(r.createdAt)}</td>
-                    <td className="p-4 text-right"><a href={r.fileUrl} target="_blank" rel="noreferrer" className="btn-ghost text-xs">View</a></td>
+                    <td className="p-4 text-right">
+                      <button onClick={() => Records.openFile(r.id)} className="btn-ghost text-xs">View</button>
+                    </td>
                   </tr>
                 ))}
               </tbody>

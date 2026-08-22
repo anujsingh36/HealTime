@@ -1,10 +1,13 @@
 package io.healtime.security;
 
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,6 +21,8 @@ import java.io.IOException;
 @Component
 @RequiredArgsConstructor
 public class JwtAuthFilter extends OncePerRequestFilter {
+
+    private static final Logger log = LoggerFactory.getLogger(JwtAuthFilter.class);
 
     private final JwtService jwtService;
     private final CustomUserDetailsService userDetailsService;
@@ -35,12 +40,17 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 UserDetails user = userDetailsService.loadUserByUsername(email);
                 if (jwtService.isValid(token, user)) {
                     UsernamePasswordAuthenticationToken t =
-                        new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+                            new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
                     t.setDetails(new WebAuthenticationDetailsSource().buildDetails(req));
                     SecurityContextHolder.getContext().setAuthentication(t);
                 }
             }
-        } catch (Exception ignored) {}
+        } catch (JwtException expiredOrMalformed) {
+
+        } catch (Exception unexpected) {
+
+            log.warn("Unexpected error while authenticating request to {}: {}", req.getRequestURI(), unexpected.toString());
+        }
         chain.doFilter(req, res);
     }
 }

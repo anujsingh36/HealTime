@@ -12,28 +12,32 @@ import java.util.UUID;
 public class DoctorDtos {
 
     public record DoctorView(
-        UUID id, UUID userId, String fullName, String email, String avatarUrl,
-        String specialization, String specializationSlug,
-        String licenseNumber, Integer yearsExperience, String bio,
-        BigDecimal consultationFee, String clinicName, String location,
-        BigDecimal rating, boolean verified
+            UUID id, UUID userId, String fullName, String email, String avatarUrl,
+            String specialization, String specializationSlug,
+            String licenseNumber, Integer yearsExperience, String bio,
+            BigDecimal consultationFee, String clinicName, String location,
+            BigDecimal rating, boolean verified,
+            Integer avgConsultationMin, Double clinicLat, Double clinicLng
     ) {}
 
     public record DoctorUpdateRequest(
-        UUID specializationId,
-        String licenseNumber,
-        Integer yearsExperience,
-        String bio,
-        BigDecimal consultationFee,
-        String clinicName,
-        String location
+            UUID specializationId,
+            String licenseNumber,
+            Integer yearsExperience,
+            String bio,
+            BigDecimal consultationFee,
+            String clinicName,
+            String location,
+            Integer avgConsultationMin,
+            Double clinicLat,
+            Double clinicLng
     ) {}
 
     public record AvailabilitySlot(
-        @NotNull DayOfWeek dayOfWeek,
-        @NotNull LocalTime startTime,
-        @NotNull LocalTime endTime,
-        @NotNull Integer slotDurationMin
+            @NotNull DayOfWeek dayOfWeek,
+            @NotNull LocalTime startTime,
+            @NotNull LocalTime endTime,
+            @NotNull Integer slotDurationMin
     ) {}
 
     public record AvailabilityUpdateRequest(@NotNull List<AvailabilitySlot> slots) {}
