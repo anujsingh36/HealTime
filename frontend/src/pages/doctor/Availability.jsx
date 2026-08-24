@@ -8,13 +8,21 @@ export default function DoctorAvailability() {
   const [slots, setSlots] = useState(
     DAYS.map(d => ({ dayOfWeek: d, startTime: '09:00', endTime: '17:00', slotDurationMin: 15, enabled: d !== 'SUNDAY' }))
   );
+  const [saving, setSaving] = useState(false);
 
   const update = (i, k, v) => setSlots(s => s.map((x,idx) => idx===i ? { ...x, [k]: v } : x));
 
   const save = async () => {
-    const payload = { slots: slots.filter(s => s.enabled).map(({enabled, ...rest}) => rest) };
-    await Doctors.setAvailability(payload);
-    toast.success('Availability saved');
+    setSaving(true);
+    try {
+      const payload = { slots: slots.filter(s => s.enabled).map(({enabled, ...rest}) => rest) };
+      await Doctors.setAvailability(payload);
+      toast.success('Availability saved');
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Could not save availability');
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -34,7 +42,9 @@ export default function DoctorAvailability() {
             </div>
           </div>
         ))}
-        <button onClick={save} className="btn-primary mt-3">Save schedule</button>
+        <button onClick={save} disabled={saving} className="btn-primary mt-3 disabled:opacity-50">
+          {saving ? 'Saving…' : 'Save schedule'}
+        </button>
       </div>
     </div>
   );

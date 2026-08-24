@@ -20,9 +20,9 @@ export default function AdminDoctors() {
           <tbody className="divide-y divide-ink-100">
             {list.map(d => (
               <tr key={d.id}>
-                <td className="p-4 font-semibold">Dr. {d.user?.fullName}</td>
+                <td className="p-4 font-semibold">Dr. {d.fullName}</td>
                 <td className="p-4 text-ink-900/70">{d.licenseNumber}</td>
-                <td className="p-4">{d.specialization?.name}</td>
+                <td className="p-4">{d.specialization}</td>
                 <td className="p-4">{d.verified ? <span className="badge-green"><ShieldCheck className="w-3 h-3"/> Verified</span> : <span className="badge-amber">Pending</span>}</td>
                 <td className="p-4 text-right">{!d.verified && <button onClick={()=>verify(d.id)} className="btn-primary text-xs">Verify</button>}</td>
               </tr>

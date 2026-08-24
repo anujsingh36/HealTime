@@ -41,6 +41,16 @@ public class AppointmentService {
     /** Extra minutes of buffer added on top of the raw travel-time estimate. */
     private static final int TRAVEL_BUFFER_MIN = 5;
 
+    /**
+     * Single timezone used everywhere "day of week" / "start of day" is interpreted — doctor
+     * availability, patient bookings, and the live queue are all reasoned about in this zone,
+     * NOT UTC. Without this, comparing a scheduled Instant's wall-clock time directly against a
+     * doctor's local working hours (e.g. 09:00–17:00) after converting via ZoneOffset.UTC would
+     * be off by the zone's offset (+05:30 for India) — a booking made at 10:00 AM local time
+     * would be seen as 04:30 UTC and wrongly rejected as "outside working hours".
+     */
+    private static final ZoneId APP_ZONE = ZoneId.of("Asia/Kolkata");
+
     private static final List<AppointmentStatus> ACTIVE_STATUSES =
             List.of(AppointmentStatus.PENDING, AppointmentStatus.CONFIRMED, AppointmentStatus.IN_PROGRESS);
 
@@ -94,7 +104,7 @@ public class AppointmentService {
      * never set as working days, or hours outside their listed schedule.
      */
     private void validateWithinAvailability(Doctor doctor, Instant scheduledAt) {
-        ZonedDateTime zdt = scheduledAt.atZone(ZoneOffset.UTC);
+        ZonedDateTime zdt = scheduledAt.atZone(APP_ZONE);
         DayOfWeek day = zdt.getDayOfWeek();
         LocalTime time = zdt.toLocalTime();
 
@@ -132,7 +142,7 @@ public class AppointmentService {
     public List<QueueView> doctorQueue() {
         Doctor d = doctors.findByUserId(security.currentUser().getId())
                 .orElseThrow(() -> ApiException.notFound("Doctor profile"));
-        Instant from = LocalDate.now().atStartOfDay(ZoneOffset.UTC).toInstant();
+        Instant from = LocalDate.now(APP_ZONE).atStartOfDay(APP_ZONE).toInstant();
         Instant to = from.plus(Duration.ofDays(1));
         return appointments.findQueue(d.getId(), from, to,
                         List.of(AppointmentStatus.CONFIRMED, AppointmentStatus.IN_PROGRESS, AppointmentStatus.PENDING))
@@ -225,8 +235,8 @@ public class AppointmentService {
      */
     @Transactional
     public void recalcQueueForDay(Doctor doctor, Instant referenceInstant) {
-        Instant dayStart = referenceInstant.atZone(ZoneOffset.UTC).toLocalDate()
-                .atStartOfDay(ZoneOffset.UTC).toInstant();
+        Instant dayStart = referenceInstant.atZone(APP_ZONE).toLocalDate()
+                .atStartOfDay(APP_ZONE).toInstant();
         Instant dayEnd = dayStart.plus(Duration.ofDays(1));
         List<Appointment> active = appointments.findActiveByDoctorAndDayOrderByScheduledAt(
                 doctor.getId(), dayStart, dayEnd, ACTIVE_STATUSES);
@@ -313,6 +323,6 @@ public class AppointmentService {
                 a.getPatient().getId(), a.getPatient().getFullName(),
                 a.getScheduledAt(), a.getStatus(),
                 a.getQueuePosition(), a.getEstimatedWaitMin(),
-                a.getReason(), a.getNotes());
+                a.getReason(), a.getNotes(), a.isLeaveNotified());
     }
 }

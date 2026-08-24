@@ -19,7 +19,7 @@ public class AppointmentDtos {
             UUID patientId, String patientName,
             Instant scheduledAt, AppointmentStatus status,
             Integer queuePosition, Integer estimatedWaitMin,
-            String reason, String notes
+            String reason, String notes, boolean leaveNotified
     ) {}
 
     public record StatusUpdate(@NotNull AppointmentStatus status, String notes) {}

@@ -19,8 +19,8 @@ export default function AdminVerify() {
               {list.map(d => (
                 <li key={d.id} className="py-3 flex items-center justify-between">
                   <div>
-                    <div className="font-semibold">Dr. {d.user?.fullName}</div>
-                    <div className="text-xs text-ink-900/60">{d.specialization?.name} · License {d.licenseNumber}</div>
+                    <div className="font-semibold">Dr. {d.fullName}</div>
+                    <div className="text-xs text-ink-900/60">{d.specialization} · License {d.licenseNumber}</div>
                   </div>
                   <button onClick={()=>verify(d.id)} className="btn-primary text-xs">Approve</button>
                 </li>

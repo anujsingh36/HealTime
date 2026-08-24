@@ -37,6 +37,16 @@ public class DoctorService {
         return toView(doctors.findById(id).orElseThrow(() -> ApiException.notFound("Doctor")));
     }
 
+    /**
+     * Full doctor list including unverified ones, for the admin panel — verified/unverified
+     * doctors both need to show up here (search() intentionally doesn't filter by verified
+     * either, but this is used by admin, not the public "Find a Doctor" search).
+     */
+    @Transactional(readOnly = true)
+    public List<DoctorView> listAll() {
+        return doctors.findAll().stream().map(this::toView).toList();
+    }
+
     public List<SpecializationView> specializations() {
         return specs.findAll().stream()
                 .map(s -> new SpecializationView(s.getId(), s.getName(), s.getSlug(), s.getDescription(), s.getIcon()))
