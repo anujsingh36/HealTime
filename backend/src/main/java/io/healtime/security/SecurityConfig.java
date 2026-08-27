@@ -54,7 +54,12 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**", "/api/public/**",
                                 "/v3/api-docs/**", "/swagger-ui/**", "/swagger", "/actuator/health").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/doctors/search", "/api/specializations").permitAll()
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/doctors/search",
+                                "/api/doctors/*/availability",
+                                "/api/specializations"
+                        ).permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/doctor/**").hasAnyRole("DOCTOR","ADMIN")
                         .requestMatchers("/api/patient/**").hasAnyRole("PATIENT","ADMIN")
