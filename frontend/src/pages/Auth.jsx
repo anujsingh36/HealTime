@@ -37,7 +37,9 @@ export default function Auth() {
       toast.success(mode === 'register' ? 'Welcome to HealTime!' : 'Welcome back');
       nav(redirect || `/${r}/dashboard`, { replace: true });
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Authentication failed');
+      const data = err.response?.data;
+      const fieldErrors = data?.errors && Object.values(data.errors)[0];
+      toast.error(fieldErrors || data?.message || 'Authentication failed');
     } finally { setLoading(false); }
   };
 
@@ -60,7 +62,7 @@ export default function Auth() {
           {mode === 'register' && (
             <>
               <div className="mt-5"><label className="label">Full name</label><input className="input" value={form.fullName} onChange={set('fullName')} required/></div>
-              <div className="mt-3"><label className="label">Phone</label><input className="input" value={form.phone} onChange={set('phone')} /></div>
+              <div className="mt-3"><label className="label">Phone</label><input className="input" type="tel" pattern="^[+]?[0-9\s-]{7,15}$" title="Enter a valid phone number" value={form.phone} onChange={set('phone')} /></div>
               <div className="mt-3">
                 <label className="label">I am a</label>
                 <div className="grid grid-cols-2 gap-2">

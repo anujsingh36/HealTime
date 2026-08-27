@@ -1,11 +1,23 @@
-import { Link, Outlet, useNavigate } from 'react-router-dom';
+import { Link, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { Logo } from '../components/Logo';
 import { useAuth } from '../store/auth';
 
 export default function PublicLayout() {
   const { user, role, logout } = useAuth();
   const nav = useNavigate();
+  const location = useLocation();
   const dash = role() ? `/${role().toLowerCase()}/dashboard` : '/auth';
+
+  // "How it works" / "Specializations" only exist as sections on the homepage. If we're
+  // already there, just scroll; otherwise navigate home first, then scroll once it's rendered.
+  const goToSection = (id) => (e) => {
+    e.preventDefault();
+    if (location.pathname === '/') {
+      document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      nav('/', { state: { scrollTo: id } });
+    }
+  };
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -14,8 +26,8 @@ export default function PublicLayout() {
           <Link to="/"><Logo /></Link>
           <nav className="hidden md:flex items-center gap-7 text-sm font-medium text-ink-900/80">
             <Link to="/doctors" className="hover:text-brand-700">Find a doctor</Link>
-            <a href="#features" className="hover:text-brand-700">How it works</a>
-            <a href="#specs" className="hover:text-brand-700">Specializations</a>
+            <a href="#features" onClick={goToSection('features')} className="hover:text-brand-700">How it works</a>
+            <a href="#specs" onClick={goToSection('specs')} className="hover:text-brand-700">Specializations</a>
           </nav>
           <div className="flex items-center gap-2">
             {user

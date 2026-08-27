@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { Specs } from '../api/endpoints';
@@ -8,6 +8,7 @@ const ICONS = { heart: Heart, sparkles: Sparkles, baby: Baby, brain: Brain, bone
 
 export default function Landing() {
   const [specs, setSpecs] = useState([]);
+  const location = useLocation();
   useEffect(() => { Specs.list().then(setSpecs).catch(() => setSpecs([
     {name:'Cardiology',slug:'cardiology',icon:'heart'},
     {name:'Dermatology',slug:'dermatology',icon:'sparkles'},
@@ -16,6 +17,16 @@ export default function Landing() {
     {name:'Orthopedics',slug:'orthopedics',icon:'bone'},
     {name:'General',slug:'general-medicine',icon:'stethoscope'}
   ])); }, []);
+
+  // If we navigated here (e.g. from the navbar on another page) wanting to land on a
+  // specific section, scroll to it once this page has rendered.
+  useEffect(() => {
+    const id = location.state?.scrollTo;
+    if (id) {
+      const t = setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' }), 50);
+      return () => clearTimeout(t);
+    }
+  }, [location.state]);
 
   return (
     <div>
