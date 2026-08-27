@@ -12,6 +12,7 @@ public class AuthDtos {
             @Email @NotBlank String email,
             @NotBlank @Size(min = 8, max = 72) String password,
             @NotBlank String fullName,
+            @Pattern(regexp = "^[+]?[0-9\\s-]{7,15}$", message = "Enter a valid phone number")
             String phone,
             @NotNull Role role,
             // Required only when role == DOCTOR
